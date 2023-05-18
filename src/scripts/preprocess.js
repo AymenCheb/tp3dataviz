@@ -71,9 +71,9 @@ export function fillMissingData (data, neighborhoods, start, end, range) {
   const filled = []
   neighborhoods.forEach(neighborhood => {
     years.forEach(year => {
-      let hit = data.find(e => e.Date_Plantation === year && e.Arrond_Nom === neighborhood)
+      let hit = data.find(e => e.Plantation_Year === year && e.Arrond_Nom === neighborhood)
       if (!hit) {
-        hit = { Arrond_Nom: neighborhood, Date_Plantation: year, Counts: 0 }
+        hit = { Arrond_Nom: neighborhood, Plantation_Year: year, Counts: 0 }
       }
       filled.push(hit)
     })

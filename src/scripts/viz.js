@@ -7,6 +7,8 @@
  */
 export function setColorScaleDomain (colorScale, data) {
   // TODO : Set domain of color scale
+  const values = data.map(entry => entry.Counts)
+  colorScale.domain(d3.extent(values))
 }
 
 /**
@@ -16,6 +18,8 @@ export function setColorScaleDomain (colorScale, data) {
  */
 export function appendRects (data) {
   // TODO : Append SVG rect elements
+  var svg = d3.select('#heatmap-svg')
+  data.forEach(entry => svg.append('g').append('rect'))
 }
 
 /**
@@ -28,6 +32,8 @@ export function appendRects (data) {
  */
 export function updateXScale (xScale, data, width, range) {
   // TODO : Update X scale
+  const maxYear = d3.max(data, entry => d3.max(entry.Plantation_Year, e => e.Plantation_Year))
+  xScale.domain(range(0, maxYear)).range([width, 0])
 }
 
 /**
@@ -40,6 +46,8 @@ export function updateXScale (xScale, data, width, range) {
 export function updateYScale (yScale, neighborhoodNames, height) {
   // TODO : Update Y scale
   // Make sure to sort the neighborhood names alphabetically
+  const sortedNeighborhoods = neighborhoodNames.sort()
+  yScale.domain(sortedNeighborhoods).range([0, height])
 }
 
 /**

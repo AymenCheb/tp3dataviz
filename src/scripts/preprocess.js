@@ -6,7 +6,9 @@
  */
 export function getNeighborhoodNames (data) {
   // TODO: Return the neihborhood names
-  return []
+  return data.map(entry => {
+    return entry.Arrond_Nom
+  })
 }
 
 /**
@@ -19,7 +21,11 @@ export function getNeighborhoodNames (data) {
  */
 export function filterYears (data, start, end) {
   // TODO : Filter the data by years
-  return []
+  const filtered = data.filter(entry => {
+    const entryYear = new Date(entry.Date_Plantation).getFullYear()
+    return entryYear >= start && entryYear <= end
+  })
+  return filtered
 }
 
 /**
@@ -31,7 +37,17 @@ export function filterYears (data, start, end) {
  */
 export function summarizeYearlyCounts (data) {
   // TODO : Construct the required data table
-  return []
+  const summarized = []
+  data.forEach(entry => {
+    const entryYear = new Date(entry.Date_Plantation).getFullYear()
+    let summary = summarized.find(e => e.Plantation_Year === entryYear && e.Arrond_Nom === entry.Arrond_Nom)
+    if (!summary) {
+      summary = { Arrond_Nom: entry.Arrond_Nom, Plantation_Year: entryYear, Counts: 0 }
+      summarized.push(summary)
+    }
+    summary.Counts += 1
+  })
+  return summarized
 }
 
 /**
@@ -48,5 +64,19 @@ export function summarizeYearlyCounts (data) {
  */
 export function fillMissingData (data, neighborhoods, start, end, range) {
   // TODO : Find missing data and fill with 0
-  return []
+  const years = []
+  for (let year = start; year <= end; year++) {
+    years.push(year)
+  }
+  const filled = []
+  neighborhoods.forEach(neighborhood => {
+    years.forEach(year => {
+      let hit = data.find(e => e.Date_Plantation === year && e.Arrond_Nom === neighborhood)
+      if (!hit) {
+        hit = { Arrond_Nom: neighborhood, Date_Plantation: year, Counts: 0 }
+      }
+      filled.push(hit)
+    })
+  })
+  return filled
 }

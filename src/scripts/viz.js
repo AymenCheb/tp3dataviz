@@ -7,8 +7,8 @@
  */
 export function setColorScaleDomain (colorScale, data) {
   // TODO : Set domain of color scale
-  const values = data.map(entry => entry.Counts)
-  colorScale.domain(d3.extent(values))
+  const counts = data.map(entry => entry.Counts)
+  colorScale.domain(d3.extent(counts))
 }
 
 /**
@@ -18,8 +18,13 @@ export function setColorScaleDomain (colorScale, data) {
  */
 export function appendRects (data) {
   // TODO : Append SVG rect elements
-  var svg = d3.select('#heatmap-svg')
-  data.forEach(entry => svg.append('g').append('rect'))
+  d3.select('#graph-g')
+    .selectAll('g.cell')
+    .data(data)
+    .enter()
+    .append('g')
+    .attr('class', 'cell')
+    .append('rect')
 }
 
 /**
@@ -32,8 +37,8 @@ export function appendRects (data) {
  */
 export function updateXScale (xScale, data, width, range) {
   // TODO : Update X scale
-  const maxYear = d3.max(data, entry => d3.max(entry.Plantation_Year, e => e.Plantation_Year))
-  xScale.domain(range(0, maxYear)).range([width, 0])
+  const yearDomain = range(d3.min(data, entry => entry.Plantation_Year), d3.max(data, entry => entry.Plantation_Year))
+  xScale.domain(yearDomain).range([0, width])
 }
 
 /**
@@ -45,7 +50,6 @@ export function updateXScale (xScale, data, width, range) {
  */
 export function updateYScale (yScale, neighborhoodNames, height) {
   // TODO : Update Y scale
-  // Make sure to sort the neighborhood names alphabetically
   const sortedNeighborhoods = neighborhoodNames.sort()
   yScale.domain(sortedNeighborhoods).range([0, height])
 }
@@ -57,6 +61,9 @@ export function updateYScale (yScale, neighborhoodNames, height) {
  */
 export function drawXAxis (xScale) {
   // TODO : Draw X axis
+  const xAxisGenerator = d3.axisTop().scale(xScale)
+  d3.select('#graph-g .x')
+    .call(xAxisGenerator)
 }
 
 /**
@@ -67,6 +74,10 @@ export function drawXAxis (xScale) {
  */
 export function drawYAxis (yScale, width) {
   // TODO : Draw Y axis
+  const yAxisGenerator = d3.axisRight().scale(yScale)
+  d3.select('#graph-g .y')
+    .attr('transform', `translate(${width},0)`)
+    .call(yAxisGenerator)
 }
 
 /**
@@ -74,6 +85,9 @@ export function drawYAxis (yScale, width) {
  */
 export function rotateYTicks () {
   // TODO : Rotate Y ticks.
+  d3.selectAll('#graph-g .y .tick').attr('transform', function () {
+    return d3.select(this).attr('transform') + ` rotate(${-30})`
+  })
 }
 
 /**
@@ -86,4 +100,10 @@ export function rotateYTicks () {
  */
 export function updateRects (xScale, yScale, colorScale) {
   // TODO : Set position, size and fill of rectangles according to bound data
+  d3.selectAll('#graph-g .cell')
+    .attr('transform', d => `translate(${xScale(d.Plantation_Year)},${yScale(d.Arrond_Nom)})`)
+    .select('rect')
+    .attr('width', xScale.bandwidth())
+    .attr('height', yScale.bandwidth())
+    .attr('fill', d => colorScale(d.Counts))
 }

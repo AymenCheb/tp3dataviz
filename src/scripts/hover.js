@@ -14,6 +14,18 @@
  */
 export function setRectHandler (xScale, yScale, rectSelected, rectUnselected, selectTicks, unselectTicks) {
   // TODO : Select the squares and set their event handlers
+  d3.select('#graph-g')
+    .selectAll('g.cell')
+    .on('mouseover', function (d) {
+      selectTicks(d.target.__data__.Arrond_Nom, d.target.__data__.Plantation_Year)
+      rectSelected(d3.select(this), xScale, yScale)
+    })
+    .on('mouseout', function (d) {
+      if (d.relatedTarget.nodeName !== 'text') {
+        unselectTicks()
+        rectUnselected(d3.select(this))
+      }
+    })
 }
 
 /**
@@ -31,6 +43,26 @@ export function rectSelected (element, xScale, yScale) {
   // TODO : Display the number of trees on the selected element
   // Make sure the nimber is centered. If there are 1000 or more
   // trees, display the text in white so it contrasts with the background.
+  const count = element.data()[0].Counts
+
+  if (element.selectAll('text')._groups[0].length === 0) {
+    element.append('text')
+      .text(function (d, i) {
+        return count
+      })
+      .attr('x', xScale.bandwidth() / 2)
+      .attr('y', yScale.bandwidth() / 2)
+      .attr('dominant-baseline', 'central')
+      .attr('text-anchor', 'middle')
+      .style('font', '14px sans-serif')
+      .style('fill', function (d, i) {
+        if (count > 1000) return '#FFF'
+        return '#000'
+      })
+
+    element.select('rect')
+      .attr('opacity', 0.75)
+  }
 }
 
 /**
@@ -44,6 +76,11 @@ export function rectSelected (element, xScale, yScale) {
  */
 export function rectUnselected (element) {
   // TODO : Unselect the element
+  element.selectAll('text')
+    .remove()
+
+  element.select('rect')
+    .attr('opacity', 1)
 }
 
 /**
@@ -54,6 +91,19 @@ export function rectUnselected (element) {
  */
 export function selectTicks (name, year) {
   // TODO : Make the ticks bold
+  d3.select('#graph-g .y')
+    .selectAll('.tick')
+    .attr('font-weight', function (d) {
+      if (d === name) return 'bold'
+      else return 'normal'
+    })
+
+  d3.select('#graph-g .x')
+    .selectAll('.tick')
+    .attr('font-weight', function (d) {
+      if (d === year) return 'bold'
+      else return 'normal'
+    })
 }
 
 /**
@@ -61,4 +111,11 @@ export function selectTicks (name, year) {
  */
 export function unselectTicks () {
   // TODO : Unselect the ticks
+  d3.select('#graph-g .y')
+    .selectAll('.tick')
+    .attr('font-weight', 'normal')
+
+  d3.select('#graph-g .x')
+    .selectAll('.tick')
+    .attr('font-weight', 'normal')
 }
